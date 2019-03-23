@@ -113,6 +113,11 @@ int lsh_launch(char **args)
   return 1;
 }
 
+/**
+   @brief Execute shell built-in or launch program.
+   @param args Null terminated list of arguments.
+   @return 1 if the shell should continue running, 0 if it should terminate
+ */
 int lsh_execute(char **args)
 {
   int i;
@@ -132,42 +137,18 @@ int lsh_execute(char **args)
 }
 
 #define LSH_RL_BUFSIZE 1024
-char *lsh_read_line(void)
-{
-  int bufsize = LSH_RL_BUFSIZE;
-  int position = 0;
-  char *buffer = malloc(sizeof(char) * bufsize);
-  int c;
+/**
+   @brief Read a line of input from stdin.
+   @return The line from stdin.
+ */
+char *lsh_read_line(void) 
+{ 
+   char* buf; 
 
-  if (!buffer) {
-    fprintf(stderr, "lsh: allocation error\n");
-    exit(EXIT_FAILURE);
-  }
-
-  while (1) {
-    // Read a character
-    c = getchar();
-
-    // If we hit EOF, replace it with a null character and return.
-    if (c == EOF || c == '\n') {
-      buffer[position] = '\0';
-      return buffer;
-    } else {
-      buffer[position] = c;
-    }
-    position++;
-
-    // If we have exceeded the buffer, reallocate.
-    if (position >= bufsize) {
-      bufsize += LSH_RL_BUFSIZE;
-      buffer = realloc(buffer, bufsize);
-      if (!buffer) {
-        fprintf(stderr, "lsh: allocation error\n");
-        exit(EXIT_FAILURE);
-      }
-    }
-  }
-}
+   buf = readline(">>> ");
+   add_history(buf); 
+   return buf; 
+} 
 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
@@ -246,4 +227,5 @@ int main(int argc, char **argv)
 
   return EXIT_SUCCESS;
 }
+
 
